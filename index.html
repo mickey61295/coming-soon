@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>genora</title>
+  <meta name="description" content="Something extraordinary is coming." />
+  <meta name="theme-color" content="#060608" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23060608'/%3E%3Ctext x='50%25' y='50%25' dy='.35em' text-anchor='middle' font-family='Georgia%2C serif' font-size='20' font-weight='700' fill='url(%23g)'%3Eg%3C/text%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%237c6eff'/%3E%3Cstop offset='100%25' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <div class="orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="grain" aria-hidden="true"></div>
+  <div class="spotlight" id="spotlight" aria-hidden="true"></div>
+
+  <main class="stage">
+
+    <div class="pill" role="status">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <span>In the making</span>
+    </div>
+
+    <h1 class="wordmark" id="wordmark" aria-label="genora"></h1>
+
+    <div class="hairline" aria-hidden="true"></div>
+
+    <p class="tagline">Something <em>extraordinary</em> is&nbsp;coming.</p>
+
+    <!-- <form class="notify-form" id="notifyForm" novalidate aria-label="Get notified at launch">
+      <div class="field">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          required
+          aria-label="Email address"
+          maxlength="254"
+        />
+        <button type="submit">Notify&nbsp;me</button>
+      </div>
+    </form> -->
+
+  </main>
+
+  <footer class="credit">genora &copy; 2026</footer>
+
+  <script>
+    /* 1. Letter stagger reveal */
+    (function () {
+      var el = document.getElementById('wordmark');
+      'genora'.split('').forEach(function (ch, i) {
+        var s = document.createElement('span');
+        s.textContent = ch;
+        s.style.animationDelay = (i * 0.07 + 0.25) + 's';
+        el.appendChild(s);
+      });
+    }());
+
+    /* 2. Particle canvas */
+    (function () {
+      var cvs = document.getElementById('particles');
+      var ctx = cvs.getContext('2d');
+      var W, H, dots;
+      function resize() {
+        W = cvs.width  = window.innerWidth;
+        H = cvs.height = window.innerHeight;
+        dots = Array.from({ length: Math.round(W * H / 7500) }, function () {
+          return {
+            x:  Math.random() * W,  y:  Math.random() * H,
+            r:  Math.random() * 1.1 + 0.25,
+            vx: (Math.random() - 0.5) * 0.13,
+            vy: (Math.random() - 0.5) * 0.13,
+            a:  Math.random() * 0.5 + 0.1,
+            da: (Math.random() - 0.5) * 0.0025
+          };
+        });
+      }
+      function tick() {
+        ctx.clearRect(0, 0, W, H);
+        dots.forEach(function (d) {
+          d.x = (d.x + d.vx + W) % W;
+          d.y = (d.y + d.vy + H) % H;
+          d.a = Math.min(0.72, Math.max(0.06, d.a + d.da));
+          if (d.a <= 0.06 || d.a >= 0.72) d.da *= -1;
+          ctx.globalAlpha = d.a;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r, 0, 6.2832);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(tick);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      tick();
+    }());
+
+    /* 3. Smooth cursor spotlight */
+    (function () {
+      var el = document.getElementById('spotlight');
+      var half = 350;
+      var tx = -9999, ty = -9999, cx = tx, cy = ty;
+      window.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; });
+      (function move() {
+        cx += (tx - cx) * 0.07;
+        cy += (ty - cy) * 0.07;
+        el.style.transform = 'translate(' + (cx - half) + 'px,' + (cy - half) + 'px)';
+        requestAnimationFrame(move);
+      }());
+    }());
+
+    /* 4. Notify form */
+    document.getElementById('notifyForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var input = this.querySelector('input');
+      var btn   = this.querySelector('button');
+      if (!input.value || !input.checkValidity()) { input.focus(); return; }
+      btn.textContent = 'See you soon \u2736';
+      btn.disabled = true;
+      input.disabled = true;
+    });
+  </script>
+
+</body>
+</html>
